@@ -1,7 +1,7 @@
 /*
     Student: Maksym Spizhovyi
     Student ID: 300 362 869
-    Lab 7
+    Lab 8
  */
 
 package minesweeper;
