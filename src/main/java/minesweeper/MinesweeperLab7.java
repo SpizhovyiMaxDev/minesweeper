@@ -42,7 +42,8 @@ public class MinesweeperLab7 extends Application {
     private Image btnCoverImage = loadImage("/assets/cover.png");
     private Image btnFlagImage = loadImage("/assets/flag.png");
     private Image mineMisflaggedImage = loadImage("/assets/mine-misflagged.png");
-    private Image[] numberImages = new Image[9];
+    private Image[] boardNumberImages = new Image[9];
+    private Image[] boxNumberImages = new Image[10];
 
     private int flaggedMines = minesCount;
     private int timeElapsed = 0;
@@ -50,6 +51,10 @@ public class MinesweeperLab7 extends Application {
     private Label mineCounterLabel = new Label();
     private Label timerLabel = new Label();
     private Label smileyLabel = new Label();
+
+    private HBox mineCounterBox = new HBox();
+    private HBox timerBox = new HBox();
+
 
     private int[][] board = new int[gridRows][gridCols];
     private Button[][] cells = new Button[gridRows][gridCols];
@@ -66,8 +71,13 @@ public class MinesweeperLab7 extends Application {
     }
 
     private void generateNumberImages(){
-        for(int i = 0; i < numberImages.length; i++){
-            numberImages[i] = loadImage("/assets/" + i + ".png");
+        for (int i = 0; i < 9; i++) {
+            boardNumberImages[i] = loadImage("/assets/board_number/" + i + ".png");
+        }
+
+
+        for(int i = 0; i < 10; i++){
+            boxNumberImages[i] = loadImage("/assets/box_number/" + i + ".png");
         }
     }
 
@@ -119,8 +129,8 @@ public class MinesweeperLab7 extends Application {
     private HBox createHeaderComponent(){
         HBox headerContainer = createHeaderContainer();
         initializeSmileyLabel();
-        initializeStyledNumericLabel(mineCounterLabel, flaggedMines);
-        initializeStyledNumericLabel(timerLabel, timeElapsed);
+        initializeStyledNumericBox(mineCounterBox, flaggedMines);
+        initializeStyledNumericBox(timerBox, timeElapsed);
         appendLabelsIntoHeaderComponent(headerContainer);
         return headerContainer;
     }
@@ -138,41 +148,46 @@ public class MinesweeperLab7 extends Application {
         return newHeader;
     }
 
-    private void initializeStyledNumericLabel(Label label, int val){
-        label.setText(String.format("%03d", val));
-        label.setFont(Font.font("Courier", FontWeight.SEMI_BOLD, 24));
-        label.setStyle(
-                        "-fx-background-color: linear-gradient(to bottom, #EAF2FB, #B0CBE8); " +
+    private void initializeStyledNumericBox(HBox mineCountContainer, int val){
+        mineCountContainer.setStyle(
+                "-fx-background-color: #000;" +
                         "-fx-padding: 10px; " +
                         "-fx-border-color: #a6a6a6; " +
                         "-fx-border-width: 1px; " +
-                        "-fx-text-fill: #000; " +
-                        "-fx-font-size: 24px; " +
-                        "-fx-font-family: 'Courier'; " +
-                        "-fx-alignment: center;"
+                        "-fx-alignment: center; " +
+                        "-fx-border-radius: 4px; " +
+                        "-fx-background-radius: 4px;"
         );
 
-        label.setMaxWidth(Double.MAX_VALUE);
-        label.setMaxHeight(Double.MAX_VALUE);
-        HBox.setHgrow(label, Priority.ALWAYS);
+        updateViewOfTheStyledNumericBox(mineCountContainer, val);
     }
 
-    private void updateViewOfTheNumericLabel(Label label, int val){
-        label.setText(String.format("%03d", val));
+    private void updateViewOfTheStyledNumericBox(HBox mineCountContainer, int val){
+        mineCountContainer.getChildren().clear();
+
+        String formatedDigit = String.format("%03d", val);
+
+        for (int i = 0; i < formatedDigit.length(); i++) {
+            Image digit = boxNumberImages[Character.getNumericValue(formatedDigit.charAt(i))];
+            ImageView digitImage = createImageView(digit, 30, 50);
+            mineCountContainer.getChildren().add(digitImage);
+        }
+
+        HBox.setHgrow(mineCountContainer, Priority.ALWAYS);
     }
 
     private void appendLabelsIntoHeaderComponent(HBox headerContainer){
-        headerContainer.getChildren().addAll(mineCounterLabel, smileyLabel, timerLabel);
+        headerContainer.getChildren().addAll(mineCounterBox, smileyLabel, timerBox);
     }
 
     private void initializeSmileyLabel(){
         ImageView smileyView = createImageViewForSmiley(faceSmileImage);
         smileyLabel.setGraphic(smileyView);
         smileyLabel.setStyle(
-                        "-fx-background-color: linear-gradient(to bottom, #EAF2FB, #B0CBE8);" +
-                        " -fx-border-color: #a6a6a6;" +
-                        " -fx-border-width: 1px;" +
-                        " -fx-padding: 5px;"
+                        "-fx-background-color: #000;" +
+                        "-fx-border-color: #a6a6a6;" +
+                        "-fx-border-width: 1px;" +
+                        "-fx-padding: 1px;"
         );
         smileyLabel.setOnMouseClicked(event -> resetGame());
     }
@@ -221,8 +236,8 @@ public class MinesweeperLab7 extends Application {
         flaggedMines = minesCount;
         gameIsOver = false;
         drawASmileyFace();
-        initializeStyledNumericLabel(mineCounterLabel, flaggedMines);
-        initializeStyledNumericLabel(timerLabel, timeElapsed);
+        initializeStyledNumericBox(mineCounterBox, flaggedMines);
+        initializeStyledNumericBox(timerBox, timeElapsed);
     }
 
     private void generateNewGameBoard() {
@@ -243,7 +258,7 @@ public class MinesweeperLab7 extends Application {
         resetMeaningfulVariables();
         resetDefaultSmileyFace();
         resetLabelsToDefaultState();
-        updateViewOfTheNumericLabel(mineCounterLabel, flaggedMines);
+        updateViewOfTheStyledNumericBox(mineCounterBox, flaggedMines);
         resetCellsView();
         placeMines();
         placeNumbersIndentifyingMinesCount();
@@ -263,8 +278,8 @@ public class MinesweeperLab7 extends Application {
     }
 
     private void resetLabelsToDefaultState(){
-        updateViewOfTheNumericLabel(mineCounterLabel, flaggedMines);
-        updateViewOfTheNumericLabel(timerLabel, timeElapsed);
+        updateViewOfTheStyledNumericBox(mineCounterBox, flaggedMines);
+        updateViewOfTheStyledNumericBox(timerBox, timeElapsed);
     }
 
     private void resetCellsView(){
@@ -433,7 +448,7 @@ public class MinesweeperLab7 extends Application {
 
     private void revealCells(int row, int col){
         if(isFlaggedCell(row, col)) {
-            updateViewOfTheNumericLabel(mineCounterLabel, ++flaggedMines);
+            updateViewOfTheStyledNumericBox(mineCounterBox, ++flaggedMines);
         }
 
         if(!isWithinBounds(row, col) || !isCoveredOrFlaggedCell(row, col)){
@@ -469,7 +484,7 @@ public class MinesweeperLab7 extends Application {
     }
 
     private ImageView createImageViewForSmiley(Image image) {
-        return createImageView(image, 50, 50);
+        return createImageView(image, 70, 70);
     }
 
     private void drawExpectedCell(){
@@ -500,7 +515,7 @@ public class MinesweeperLab7 extends Application {
     }
 
     private void drawANumber(int row, int col){
-        ImageView numberView = createImageViewForBoardCell(numberImages[board[row][col]]);
+        ImageView numberView = createImageViewForBoardCell(boardNumberImages[board[row][col]]);
         cells[row][col].setGraphic(numberView);
     }
 
@@ -547,13 +562,13 @@ public class MinesweeperLab7 extends Application {
         if(flaggedMines == 0) return;
         ImageView flagView = createImageViewForBoardCell(btnFlagImage);
         cells[row][col].setGraphic(flagView);
-        updateViewOfTheNumericLabel(mineCounterLabel, --flaggedMines);
+        updateViewOfTheStyledNumericBox(mineCounterBox, --flaggedMines);
     }
 
     private void removeFlag(int row, int col){
         ImageView coverView = createImageViewForBoardCell(btnCoverImage);
         cells[row][col].setGraphic(coverView);
-        updateViewOfTheNumericLabel(mineCounterLabel, ++flaggedMines);
+        updateViewOfTheStyledNumericBox(mineCounterBox, ++flaggedMines);
     }
 
     private ImageView createImageViewForBoardCell(Image image) {
