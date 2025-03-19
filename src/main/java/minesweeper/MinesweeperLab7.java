@@ -1,8 +1,7 @@
 /*
     Student: Maksym Spizhovyi
     Student ID: 300 362 869
-
-    // Branch Maste
+    Lab 7
  */
 
 package minesweeper;
