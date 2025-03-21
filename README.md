@@ -1,5 +1,4 @@
 # Minesweeper Game
-Tech Stack: Java, JavaFX 
 
 ## About the Project
 I developed this Minesweeper game as part of my class project, using Java and JavaFX. My goal was to recreate the classic Minesweeper experience with a clean and interactive user interface, smooth animations, and customizable difficulty settings.
