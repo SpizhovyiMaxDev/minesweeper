@@ -1,6 +1,4 @@
 # Minesweeper Game
-
-## About the Project
 I developed this Minesweeper game as part of my class project, using Java and JavaFX. My goal was to recreate the classic Minesweeper experience with a clean and interactive user interface, smooth animations, and customizable difficulty settings.
 
 While working on this project, I focused on developing my skills in writing clean, maintainable code. I followed Uncle Bob’s (Robert C. Martin) principles, applying SOLID concepts and striving to make my functions small, focused, and self-explanatory. Each function in the codebase is designed to clearly reveal its intent, improving readability and maintainability.
