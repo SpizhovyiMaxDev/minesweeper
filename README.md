@@ -7,6 +7,14 @@ I developed this Minesweeper game as part of my class project, using Java and Ja
 While working on this project, I focused on developing my skills in writing clean, maintainable code. I followed Uncle Bob’s (Robert C. Martin) principles, applying SOLID concepts and striving to make my functions small, focused, and self-explanatory. Each function in the codebase is designed to clearly reveal its intent, improving readability and maintainability.
 <br>
 
+## Tools Required  
+
+To run the game, you'll need to have the following tools installed:  
+
+- **Java 17+** ([Download Java](https://adoptium.net/))  
+- **JavaFX SDK** ([Download JavaFX](https://openjfx.io/))  
+- **IDE (Optional)**: You can use an IDE like **IntelliJ IDEA** or **Eclipse** to easily manage and run the project. 
+
 ## Features  
 - **Fully functional Minesweeper game** with classic rules  
 - **JavaFX-based UI** for a modern and responsive design  
@@ -25,5 +33,5 @@ While working on this project, I focused on developing my skills in writing clea
 <br>
 
 ## License
-This project was developed as part of my coursework at Okanagan College. It is intended for educational and non-commercial use only. 
+This project was developed as part of my coursework at **Okanagan College**. It is intended for educational and non-commercial use only. 
 Redistribution or modification requires permission.
