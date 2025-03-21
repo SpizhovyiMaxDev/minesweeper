@@ -1,7 +1,6 @@
 /*
     Student: Maksym Spizhovyi
     Student ID: 300 362 869
-    Lab 8
  */
 
 package minesweeper;
@@ -61,24 +60,33 @@ public class MinesweeperLab8 extends Application {
     Map<String, ArrayList<Integer>> difficultyGridSizes = new HashMap<>();
     private boolean firstClickCompleted = false;
 
-    @Override
     public void start(Stage primaryStage) {
-        generateNumberImages();
+        loadBoardAndBoxNumberImages();
         initializeDifficultyGridSizes();
         setupUserInterface(primaryStage);
     }
 
-    private void generateNumberImages(){
-        for (int i = 0; i < 9; i++) {
-            boardNumberImages[i] = loadImage("/assets/board_number/" + i + ".png");
-        }
+    private void loadBoardAndBoxNumberImages() {
+        loadBoardNumberImages();
+        loadBoxNumberImages();
+    }
 
-
-        for(int i = 0; i < 10; i++){
-            boxNumberImages[i] = loadImage("/assets/box_number/" + i + ".png");
+    private void loadBoardNumberImages() {
+        for (int number = 0; number <= 8; number++) {
+            boardNumberImages[number] = loadImage(imagePath("board_number", number));
         }
     }
 
+    private void loadBoxNumberImages() {
+        for (int number = 0; number <= 9; number++) {
+            boxNumberImages[number] = loadImage(imagePath("box_number", number));
+        }
+    }
+
+    private String imagePath(String folder, int number) {
+        return String.format("/assets/%s/%d.png", folder, number);
+    }
+    
     private Image loadImage(String path) {
         URL url = getClass().getResource(path);
 
