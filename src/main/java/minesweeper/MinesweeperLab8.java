@@ -168,20 +168,6 @@ public class MinesweeperLab8 extends Application {
         updateViewOfTheStyledNumericBox(mineCountContainer, val);
     }
 
-    private void updateViewOfTheStyledNumericBox(HBox mineCountContainer, int val){
-        mineCountContainer.getChildren().clear();
-
-        String formatedDigit = String.format("%03d", val);
-
-        for (int i = 0; i < formatedDigit.length(); i++) {
-            Image digit = boxNumberImages[Character.getNumericValue(formatedDigit.charAt(i))];
-            ImageView digitImage = createImageView(digit, 30, 50);
-            mineCountContainer.getChildren().add(digitImage);
-        }
-
-        HBox.setHgrow(mineCountContainer, Priority.ALWAYS);
-    }
-
     private void appendLabelsIntoHeaderComponent(HBox headerContainer){
         headerContainer.getChildren().addAll(mineCounterBox, smileyLabel, timerBox);
     }
@@ -577,6 +563,20 @@ public class MinesweeperLab8 extends Application {
         updateViewOfTheStyledNumericBox(mineCounterBox, ++flaggedMines);
     }
 
+    private void updateViewOfTheStyledNumericBox(HBox mineCountContainer, int val){
+        mineCountContainer.getChildren().clear();
+
+        String formatedDigit = String.format("%03d", val);
+
+        for (int i = 0; i < formatedDigit.length(); i++) {
+            Image digit = boxNumberImages[Character.getNumericValue(formatedDigit.charAt(i))];
+            ImageView digitImage = createImageView(digit, 30, 50);
+            mineCountContainer.getChildren().add(digitImage);
+        }
+
+        HBox.setHgrow(mineCountContainer, Priority.ALWAYS);
+    }
+    
     private ImageView createImageViewForBoardCell(Image image) {
         return createImageView(image, cellSize, cellSize);
     }
