@@ -3,7 +3,7 @@
     Student ID: 300 362 869
  */
 
-package minesweeper;
+package com.example.minesweeperapp;
 
 import javafx.application.Application;
 import javafx.geometry.Pos;
@@ -23,13 +23,13 @@ import javafx.stage.Stage;
 import java.net.URL;
 import java.util.*;
 
-public class MinesweeperLab8 extends Application {
+public class Lab8Minesweeper extends Application {
     VBox root = new VBox();
 
-    private int cellSize = 20;
-    private int gridRows = 16;
-    private int gridCols = 16;
-    private int minesCount = 40;
+    private int cellSize = 25;
+    private int gridRows = 8;
+    private int gridCols = 8;
+    private int minesCount = 10;
 
     private Image faceDeadImage = loadImage("/assets/face-dead.png");
     private Image faceSmileImage = loadImage("/assets/face-smile.png");
@@ -60,6 +60,9 @@ public class MinesweeperLab8 extends Application {
     Map<String, ArrayList<Integer>> difficultyGridSizes = new HashMap<>();
     private boolean firstClickCompleted = false;
 
+    private int[] rowsOffsets = {-1, -1, -1,  0, 0,  1, 1, 1};
+    private int[] colsOffsets = {-1,  0,  1, -1, 1, -1, 0, 1};
+
     public void start(Stage primaryStage) {
         loadBoardAndBoxNumberImages();
         initializeDifficultyGridSizes();
@@ -67,26 +70,16 @@ public class MinesweeperLab8 extends Application {
     }
 
     private void loadBoardAndBoxNumberImages() {
-        loadBoardNumberImages();
-        loadBoxNumberImages();
-    }
-
-    private void loadBoardNumberImages() {
-        for (int number = 0; number <= 8; number++) {
-            boardNumberImages[number] = loadImage(imagePath("board_number", number));
-        }
-    }
-
-    private void loadBoxNumberImages() {
-        for (int number = 0; number <= 9; number++) {
-            boxNumberImages[number] = loadImage(imagePath("box_number", number));
+        for(int number = 0; number <= 9; number++){
+            boxNumberImages[number] = loadImage(imagePath("box_digits", number));
+            if(number != 9) boardNumberImages[number] = loadImage(imagePath("board_digits", number));
         }
     }
 
     private String imagePath(String folder, int number) {
         return String.format("/assets/%s/%d.png", folder, number);
     }
-    
+
     private Image loadImage(String path) {
         URL url = getClass().getResource(path);
 
@@ -146,7 +139,7 @@ public class MinesweeperLab8 extends Application {
         newHeader.setAlignment(Pos.CENTER);
         newHeader.setSpacing(1);
         newHeader.setStyle(
-                        "-fx-padding: 5px;" +
+                "-fx-padding: 5px;" +
                         " -fx-background-color: #DBDBDB;" +
                         " -fx-border-color:  #a6a6a6;" +
                         " -fx-border-width: 1px;"
@@ -156,7 +149,7 @@ public class MinesweeperLab8 extends Application {
 
     private void initializeStyledNumericBox(HBox mineCountContainer, int val){
         mineCountContainer.setStyle(
-                "-fx-background-color: #000;" +
+                "-fx-background-color: #333;" +
                         "-fx-padding: 10px; " +
                         "-fx-border-color: #a6a6a6; " +
                         "-fx-border-width: 1px; " +
@@ -176,7 +169,7 @@ public class MinesweeperLab8 extends Application {
         ImageView smileyView = createImageViewForSmiley(faceSmileImage);
         smileyLabel.setGraphic(smileyView);
         smileyLabel.setStyle(
-                        "-fx-background-color: #000;" +
+                "-fx-background-color: #000;" +
                         "-fx-border-color: #a6a6a6;" +
                         "-fx-border-width: 1px;" +
                         "-fx-padding: 1px;"
@@ -212,6 +205,7 @@ public class MinesweeperLab8 extends Application {
         ArrayList<Integer> data = difficultyGridSizes.get(mode);
         if (data == null) return;
 
+        resetMeaningfulVariables();
         applyDifficultySettings(data);
         resetUIElementsForNewGame();
         generateNewGameBoard();
@@ -297,8 +291,8 @@ public class MinesweeperLab8 extends Application {
     private GridPane generateNewCellBoardContainer(){
         GridPane cellBoardContainer = new GridPane();
         cellBoardContainer.setStyle(
-                        "-fx-hgap: 2px;" +
-                        " -fx-vgap: 2px;" +
+                "-fx-hgap: 1px;" +
+                        " -fx-vgap: 1px;" +
                         " -fx-padding: 1px;" +
                         " -fx-background-color: #A0A0A0;"
         );
@@ -344,7 +338,7 @@ public class MinesweeperLab8 extends Application {
         Button cell = new Button();
         cell.setMinSize(cellSize, cellSize);
         cell.setStyle(
-                        "-fx-background-color: lightgray;" +
+                "-fx-background-color: lightgray;" +
                         " -fx-border-color: darkgray;" +
                         " -fx-border-width: 2px;" +
                         " -fx-padding: 0px;"
@@ -365,8 +359,6 @@ public class MinesweeperLab8 extends Application {
 
     private int getAdjacentMineCount(int row, int col){
         int mineCount = 0;
-        int[] rowsOffsets = {-1, -1, -1,  0, 0,  1, 1, 1};
-        int[] colsOffsets = {-1,  0,  1, -1, 1, -1, 0, 1};
 
         for(int i = 0; i < 8; i++){
             int adjacentRow = rowsOffsets[i] + row;
@@ -388,13 +380,12 @@ public class MinesweeperLab8 extends Application {
         if(gameIsOver) return;
         if(isFlaggedCell(row, col) || !isCoveredCell(row, col)) return;
 
-        if(!firstClickCompleted && isMine(row, col)) {
+        if(isInvalidClick(row, col)) {
             rebuildBoard(row, col);
         }
 
         if(isMine(row, col)){
-            drawRedMine(row, col);
-            gameOver();
+            gameOver(row, col);
         } else {
             revealCells(row, col);
         }
@@ -407,10 +398,17 @@ public class MinesweeperLab8 extends Application {
     }
 
 
+    private boolean isANumber(int row, int col){
+        return board[row][col] > 0;
+    }
+
+    private boolean isInvalidClick(int row, int col){
+        return !firstClickCompleted && (isMine(row, col) || isANumber(row, col));
+    }
+
     private void rebuildBoard(int safeRow, int safeCol) {
         board = new int[gridRows][gridCols];
         gameIsOver = false;
-        flaggedMines = minesCount;
         placeMinesSafely(safeRow, safeCol);
         placeNumbersIndentifyingMinesCount();
     }
@@ -422,11 +420,26 @@ public class MinesweeperLab8 extends Application {
             int row = locationGenerator.nextInt(gridRows);
             int col = locationGenerator.nextInt(gridCols);
 
-            if (!isMine(row, col) && !(row == safeRow && col == safeCol)) {
+            if (!isMine(row, col) && isInSafeZone(row, col, safeRow, safeCol)) {
                 board[row][col] = -1;
                 placedMines++;
             }
         }
+    }
+
+    private boolean isInSafeZone(int row, int col, int safeRow, int safeCol) {
+        if(row == safeRow && col == safeCol) return false;
+
+        for(int i = 0; i < 8; i++){
+            int adjacentRow = rowsOffsets[i] + safeRow;
+            int adjacentCol = colsOffsets[i] + safeCol;
+
+            if(adjacentCol == col && adjacentRow == row){
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private boolean isCoveredCell(int row, int col){
@@ -440,19 +453,16 @@ public class MinesweeperLab8 extends Application {
 
     private void revealCells(int row, int col){
         if(isFlaggedCell(row, col)) {
-            updateViewOfTheStyledNumericBox(mineCounterBox, ++flaggedMines);
+            removeFlag(row, col);
         }
 
-        if(!isWithinBounds(row, col) || !isCoveredOrFlaggedCell(row, col)){
+        if(!isWithinBounds(row, col) || !isCoveredOrFlaggedCell(row, col)) {
             return;
         }
 
         drawANumber(row, col);
 
         if(board[row][col] > 0) return;
-
-        int[] rowsOffsets = {-1, -1, -1, 0, 0,  1, 1, 1};
-        int[] colsOffsets = {-1,  0, 1, -1, 1, -1, 0, 1};
 
         for(int i = 0; i < 8; i++){
             int adjacentRow = row + rowsOffsets[i];
@@ -464,7 +474,9 @@ public class MinesweeperLab8 extends Application {
         }
     }
 
-    private void gameOver(){
+
+    private void gameOver(int row, int col){
+        drawRedMine(row, col);
         drawDeadFace();
         gameIsOver = true;
         drawExpectedCell();
@@ -483,18 +495,26 @@ public class MinesweeperLab8 extends Application {
         for(int row = 0; row < gridRows; row++){
             for(int col = 0; col < gridCols; col++){
                 if(isRedMine(row, col)) continue;
-                if(isFlaggedCell(row, col) && isMine(row, col)) {
-                    ImageView mineMisflaggedView = createImageViewForBoardCell(mineMisflaggedImage);
-                    cells[row][col].setGraphic(mineMisflaggedView);
-                    continue;   
+                if(isFlaggedCell(row, col) && !isMine(row, col)) {
+                    drawMisflaggedCell(row, col);
+                    continue;
                 };
 
                 if(isMine(row, col)){
-                    ImageView mine = createImageViewForBoardCell(mineGreyImage);
-                    cells[row][col].setGraphic(mine);
+                    drawMine(row, col);
                 }
             }
         }
+    }
+
+    private void drawMine(int row, int col){
+        ImageView mine = createImageViewForBoardCell(mineGreyImage);
+        cells[row][col].setGraphic(mine);
+    }
+
+    private void drawMisflaggedCell(int row, int col){
+        ImageView mineMisflaggedView = createImageViewForBoardCell(mineMisflaggedImage);
+        cells[row][col].setGraphic(mineMisflaggedView);
     }
 
     private boolean isRedMine(int row, int col){
@@ -536,10 +556,60 @@ public class MinesweeperLab8 extends Application {
         smileyLabel.setGraphic(winFaceView);
     }
 
-    private void handleRightCellClick(int row, int col){
-        if(!isCoveredOrFlaggedCell(row, col) || gameIsOver) return;
-        if(isFlaggedCell(row, col)) removeFlag(row, col);
-        else addFlag(row, col);
+    private void handleRightCellClick(int row, int col) {
+        if (gameIsOver) return;
+
+        if (canChordReveal(row, col)) {
+            revealCellsAroundClick(row, col);
+            return;
+        }
+
+        if (isFlaggedCell(row, col)) {
+            removeFlag(row, col);
+            return;
+        }
+
+        if (isCoveredCell(row, col)) {
+            addFlag(row, col);
+        }
+    }
+
+
+    private boolean canChordReveal(int row, int col) {
+        return isANumber(row, col) && !isCoveredCell(row, col) && containsAnyFlaggedCellsAround(row, col);
+    }
+
+    private boolean containsAnyFlaggedCellsAround(int row, int col){
+        for(int i = 0; i < 8; i++){
+            int adjacentRow = row + rowsOffsets[i];
+            int adjacentCol = col + colsOffsets[i];
+
+            if(isWithinBounds(adjacentRow, adjacentCol) && isFlaggedCell(adjacentRow, adjacentCol)){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void revealCellsAroundClick(int row, int col){
+        if(isMine(row, col)) drawRedMine(row, col);
+        for(int i = 0; i < 8; i++) {
+            int adjacentRow = row + rowsOffsets[i];
+            int adjacentCol = col + colsOffsets[i];
+
+            if(isANumber(adjacentRow, adjacentCol)){
+                drawANumber(adjacentRow, adjacentCol);
+            }
+
+            if(isFlaggedCell(adjacentRow, adjacentCol) && !isMine(adjacentRow, adjacentCol)){
+                drawMisflaggedCell(row, col);
+            }
+
+            if(isMine(adjacentRow, adjacentCol)){
+                gameOver(adjacentRow, adjacentCol);
+            }
+        }
     }
 
     private boolean isCoveredOrFlaggedCell(int row, int col){
@@ -554,13 +624,15 @@ public class MinesweeperLab8 extends Application {
         if(flaggedMines == 0) return;
         ImageView flagView = createImageViewForBoardCell(btnFlagImage);
         cells[row][col].setGraphic(flagView);
-        updateViewOfTheStyledNumericBox(mineCounterBox, --flaggedMines);
+        flaggedMines--;
+        updateViewOfTheStyledNumericBox(mineCounterBox, flaggedMines);
     }
 
     private void removeFlag(int row, int col){
         ImageView coverView = createImageViewForBoardCell(btnCoverImage);
         cells[row][col].setGraphic(coverView);
-        updateViewOfTheStyledNumericBox(mineCounterBox, ++flaggedMines);
+        flaggedMines++;
+        updateViewOfTheStyledNumericBox(mineCounterBox, flaggedMines);
     }
 
     private void updateViewOfTheStyledNumericBox(HBox mineCountContainer, int val){
@@ -576,7 +648,7 @@ public class MinesweeperLab8 extends Application {
 
         HBox.setHgrow(mineCountContainer, Priority.ALWAYS);
     }
-    
+
     private ImageView createImageViewForBoardCell(Image image) {
         return createImageView(image, cellSize, cellSize);
     }
@@ -588,4 +660,3 @@ public class MinesweeperLab8 extends Application {
         return imageView;
     }
 }
-
